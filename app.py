@@ -1,20 +1,20 @@
 import config as cfg
+import db
 import fetch
+from time import sleep
 
 
-def format_this(data):
-    str = ''
-    for item in data:
-        str += f"{item['site']} | {item['author']}\n{item['assetId']} | {item['title']}\n{item['publishFromDate']} {item['lastmodified']}\n----------------------------\n"
-    return str
+def process_results(posts, site):
+    data = [{'assetId': item['assetId'], 'title': item['title'], 'publishFromDate': item['publishFromDate'],
+             'lastmodified': item['lastmodified'], 'site': item['newspaperName'], 'author': item['authorName']} for item in posts]
+    db.db_add(data, site)
+    sleep(5)
 
 
-url = cfg.config['apis']['default'][0]['url']
-filter = cfg.config['apis']['default'][0]['filter']
-
-results = fetch.fetch_data(s_url=url, b_json=True, l_filter=filter)
-
-data = [{'assetId': item['assetId'], 'title': item['title'], 'publishFromDate': item['publishFromDate'],
-        'lastmodified': item['lastmodified'], 'site': item['newspaperName'], 'author': item['authorName']} for item in results]
-
-print(format_this(data))
+for item in cfg.config['apis']:
+    site = item['name']
+    url = item['url']
+    filter = item['filter']
+    results = fetch.fetch_data(s_url=url, b_json=True, l_filter=filter)
+    process_results(results, site)
+    db.print_format(site)

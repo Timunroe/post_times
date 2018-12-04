@@ -7,6 +7,8 @@ name = "pypi"
 requests = "*"
 "flake8" = "*"
 "autopep8" = "*"
+tinydb = "*"
+ujson = "*"
 
 [dev-packages]
 
